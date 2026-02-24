@@ -1,88 +1,141 @@
-using System.Collections;
+using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManagers : MonoBehaviour
 {
-    [SerializeField]private int _foodTotal;
-    [SerializeField]private int _grillTotal;
-    [SerializeField]private Transform grid;
-    List<GrillStation> _listGrills;
-    private float avgTray;
-    List<Sprite> resSprite;
+    private static GameManagers _instance;
+    public static GameManagers Instance => _instance;
 
-    // Start is called before the first frame update
-    void Awake()
+    [SerializeField] private int _allFood;
+    [SerializeField] private int _totalFood; // tong so loai thuc an
+    [SerializeField] private int _totalGrill; // tong so bep
+    [SerializeField] private Transform _gridGrill;
+
+    private List<GrillStation> _listGrills;
+    private float _avgTray; // gia tri trung binh thuc an cho 1 dia
+    private List<Sprite> _totalSpriteFood;
+
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private void Awake()
     {
-        Sprite[] resourceSprite = Resources.LoadAll<Sprite>("item");
-        resSprite = resourceSprite.ToList<Sprite>();
-        _listGrills = Utils.GetListFromChild<GrillStation>(grid);
+        _listGrills = Utils.GetListInChild<GrillStation>(_gridGrill);
+        Sprite[] loadedSprite = Resources.LoadAll<Sprite>("Item");
+        _totalSpriteFood = loadedSprite.ToList();
+        _instance = this;
     }
 
-    // Update is called once per frame
     void Start()
     {
-        OnInitLever();
+        OnInitLevel();
     }
-    public void OnInitLever()
+
+    private void OnInitLevel()
     {
-        List<Sprite> takefood = resSprite.OrderBy(x => Random.value).Take(_foodTotal).ToList();
-        List<Sprite> usefood = new List<Sprite>();
-        for(int i = 0; i < takefood.Count; i++)
+        List<Sprite> takeFood = _totalSpriteFood.OrderBy(x => Random.value).Take(_totalFood).ToList();
+        List<Sprite> useFood = new List<Sprite>();
+
+        for (int i = 0; i < _allFood; i++)
         {
+            int n = i % takeFood.Count;
             for (int j = 0; j < 3; j++)
-            {
-                usefood.Add(takefood[i]);
-            }
+                useFood.Add(takeFood[n]);
         }
-        for (int i = 0; i < takefood.Count; i++)
+
+        _avgTray = Random.Range(1.4f, 2f);
+        int totalTray = Mathf.RoundToInt(useFood.Count / _avgTray);// tinh tong so dia
+
+        List<int> trayPerGrill = this.DistributeEvelyn(_totalGrill, totalTray);
+        List<int> foodPerGrill = this.DistributeEvelyn(_totalGrill, useFood.Count);
+
+        for (int i = 0; i < _listGrills.Count; i++)
         {
-            int rand = Random.Range(0, takefood.Count);
-            (usefood[i], usefood[rand]) = (usefood[rand], usefood[i]);
-        }
-        //tinh trung binh khay
-        avgTray = Random.Range(1.5f, 2.5f);
-        int totalTray = usefood.Count / (int)avgTray;
-        //chia deu
-        List<int> trayPerGrill = distributeEvenly(_grillTotal, totalTray);
-        List<int> foodPerGrill = distributeEvenly(_grillTotal, usefood.Count);
-        //Displays
-        for (int i = 0; i < _foodTotal; i++)
-        {
-            bool activeGrill = i < _grillTotal;
+            bool activeGrill = i < _totalGrill;
             _listGrills[i].gameObject.SetActive(activeGrill);
 
             if (activeGrill)
             {
-                List<Sprite> lisFood = Utils.TakeAndRemoveRandom<Sprite>(usefood, foodPerGrill[i]);
+                List<Sprite> lisFood = Utils.TakeAndRemoveRandom<Sprite>(useFood, foodPerGrill[i]);
                 _listGrills[i].OnInitGrill(trayPerGrill[i], lisFood);
+
             }
         }
+
     }
-    //chia deu
-    public List<int> distributeEvenly(int totalGrill,int totalTray){
+
+    private List<int> DistributeEvelyn(int grillCount, int totalTrays)
+    {
         List<int> result = new List<int>();
-        //chia so luong dia
-        int low = totalTray / totalGrill;
-        int high = low + 1;
-        //chia dia ra grill
-        int highCount = totalTray - low * totalGrill;
-        int lowCount = totalGrill - highCount;
-        //
-        for(int i = 0; i < highCount; i++)
-        {
-            result.Add(high);
-        }
+
+        // tinh trung binh so luong dia
+        float avg = (float)totalTrays / grillCount; // 3.5
+        int low = Mathf.FloorToInt(avg); // 3
+        int high = Mathf.CeilToInt(avg); // 4
+
+        int hightCount = totalTrays - low * grillCount; // tinh so bep nhieu khay hon
+        int lowCount = grillCount - hightCount;
+
         for (int i = 0; i < lowCount; i++)
-        {
             result.Add(low);
-        }
-        for(int i = 0; i < result.Count; i++)
+
+        for (int i = 0; i < hightCount; i++)
+            result.Add(high);
+
+        // dao vi tri
+        for (int i = 0; i < result.Count; i++)
         {
-            int rand = Random.Range(0, result.Count);
+            int rand = Random.Range(i, result.Count);
             (result[i], result[rand]) = (result[rand], result[i]);
         }
+
         return result;
+    }
+
+    public void OnMinusFood()
+    {
+        --_allFood;
+        if (_allFood <= 0)
+        {
+            Debug.Log("Game Completeeeeee");
+        }
+    }
+
+    public void OnCheckAndShake()
+    {
+        Dictionary<string, List<FoodSlot>> groups = new Dictionary<string, List<FoodSlot>>();
+
+        foreach (var grill in _listGrills)
+        {
+            if (grill.gameObject.activeInHierarchy)
+            {
+                for (int i = 0; i < grill.TotalSlot.Count; i++)
+                {
+                    FoodSlot slot = grill.TotalSlot[i];
+                    if (slot.HasFood)
+                    {
+                        string name = slot.GetSpriteFood.name;
+                        if (!groups.ContainsKey(name))
+                            groups.Add(name, new List<FoodSlot>());
+
+                        groups[name].Add(slot);
+                    }
+                }
+            }
+        }
+
+        foreach (var kvp in groups)
+        {
+            if (kvp.Value.Count >= 3)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    kvp.Value[i].DoShake();
+                }
+
+                return;
+            }
+        }
+
     }
 }
