@@ -57,7 +57,6 @@ public class GameManager : MonoBehaviour
             {
                 List<Sprite> lisFood = Utils.TakeAndRemoveRandom<Sprite>(usefood, foodPerGrill[i]);
                 _listGrills[i].OnInitGrill(trayPerGrill[i], lisFood);
-
             }
         }
     }
