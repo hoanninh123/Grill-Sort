@@ -41,13 +41,19 @@ public class DropDragCtrl : MonoBehaviour
                     _currentFood?.OnActiveFood(true);
                     _cacheFood = _currentFood = tapSlot;
                     // Gan sprite food cho dummy image
+                    _imgFoodDrag.color = Color.white;
+                    _imgFoodDrag.SetNativeSize();
                     _imgFoodDrag.gameObject.SetActive(true);
                     _imgFoodDrag.sprite = _currentFood.GetSpriteFood;
-                    _imgFoodDrag.SetNativeSize();
+
+                    RectTransform dstRect = _imgFoodDrag.GetComponent<RectTransform>();
+                    dstRect.sizeDelta = _currentFood.GetFoodRect.sizeDelta;
+                    _imgFoodDrag.transform.position = _currentFood.transform.position;
+
                     _imgFoodDrag.transform.position = _currentFood.transform.position; // gan vi tri               
 
                     //tinh offset
-                    Vector3 mouseWordPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    Vector3 mouseWordPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0f); ;
                     _offset = _currentFood.transform.position - mouseWordPos;
                     _offset.z = 0f;
 
@@ -82,7 +88,7 @@ public class DropDragCtrl : MonoBehaviour
 
         if (_hasDrag)
         {
-            Vector3 mouseWordPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 mouseWordPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0f); ;
             Vector3 foodPos = mouseWordPos + _offset;
             foodPos.z = 0f;
             _imgFoodDrag.transform.position = foodPos;

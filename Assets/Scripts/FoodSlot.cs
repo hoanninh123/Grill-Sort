@@ -86,4 +86,6 @@ public class FoodSlot : MonoBehaviour
 
     public bool HasFood => _imgFood.gameObject.activeInHierarchy && _imgFood.color == _normalColor;
     public Sprite GetSpriteFood => _imgFood.sprite;
+
+    public RectTransform GetFoodRect => _imgFood.GetComponent<RectTransform>();
 }

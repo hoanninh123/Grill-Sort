@@ -21,7 +21,7 @@ public class GameManagers : MonoBehaviour
     private void Awake()
     {
         _listGrills = Utils.GetListInChild<GrillStation>(_gridGrill);
-        Sprite[] loadedSprite = Resources.LoadAll<Sprite>("Item");
+        Sprite[] loadedSprite = Resources.LoadAll<Sprite>("Items");
         _totalSpriteFood = loadedSprite.ToList();
         _instance = this;
     }
@@ -33,7 +33,7 @@ public class GameManagers : MonoBehaviour
 
     private void OnInitLevel()
     {
-        List<Sprite> takeFood = _totalSpriteFood.OrderBy(x => Random.value).Take(_totalFood).ToList();
+        List<Sprite> takeFood = _totalSpriteFood.OrderBy(x => Random.value).Take(_totalFood).ToList();//
         List<Sprite> useFood = new List<Sprite>();
 
         for (int i = 0; i < _allFood; i++)
