@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class DropDragCtrl : MonoBehaviour
+public class DropAndDragFood : MonoBehaviour
 {
     [SerializeField] private Image _imgFoodDrag;
     [SerializeField] private float _timeCheckSuggest;
