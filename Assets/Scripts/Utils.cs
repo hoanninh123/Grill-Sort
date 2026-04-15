@@ -4,6 +4,10 @@ using UnityEngine.EventSystems;
 
 public class Utils
 {
+    private static EventSystem _cachedEventSystem;
+    private static PointerEventData _cachedPointerEventData;
+    private static readonly List<RaycastResult> _cachedRaycastResults = new List<RaycastResult>();
+
     public static List<T> GetListInChild<T>(Transform parent)
     {
         List<T> result = new List<T>();
@@ -35,19 +39,25 @@ public class Utils
 
     public static T GetRayCastUI<T>(Vector2 position) where T : MonoBehaviour
     {
-        PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
-        pointerEventData.position = position;
-        List<RaycastResult> list = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(pointerEventData, list);
+        EventSystem eventSystem = EventSystem.current;
+        if (eventSystem == null)
+            return null;
 
-        if (list.Count > 0)
+        if (_cachedPointerEventData == null || _cachedEventSystem != eventSystem)
         {
-            for (int i = 0; i < list.Count; i++)
-            {
-                T component = list[i].gameObject.GetComponent<T>();
-                if (component != null)
-                    return component;
-            }
+            _cachedEventSystem = eventSystem;
+            _cachedPointerEventData = new PointerEventData(eventSystem);
+        }
+
+        _cachedPointerEventData.position = position;
+        _cachedRaycastResults.Clear();
+        eventSystem.RaycastAll(_cachedPointerEventData, _cachedRaycastResults);
+
+        for (int i = 0; i < _cachedRaycastResults.Count; i++)
+        {
+            T component = _cachedRaycastResults[i].gameObject.GetComponent<T>();
+            if (component != null)
+                return component;
         }
 
         return null;

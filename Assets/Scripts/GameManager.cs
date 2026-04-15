@@ -29,6 +29,7 @@ public class GameManagers : MonoBehaviour
     void Start()
     {
         OnInitLevel();
+        GameEvents.RaiseFoodCountChanged(_allFood);
     }
 
     private void OnInitLevel()
@@ -95,9 +96,12 @@ public class GameManagers : MonoBehaviour
     public void OnMinusFood()
     {
         --_allFood;
+        GameEvents.RaiseFoodCountChanged(_allFood);
+
         if (_allFood <= 0)
         {
             Debug.Log("Game Completeeeeee");
+            GameEvents.RaiseGameCompleted();
         }
     }
 

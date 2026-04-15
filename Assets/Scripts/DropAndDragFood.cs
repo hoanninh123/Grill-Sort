@@ -8,17 +8,17 @@ public class DropAndDragFood : MonoBehaviour
     [SerializeField] private float _timeCheckSuggest;
 
     private FoodSlot _currentFood, _cacheFood;
+    private RectTransform _imgFoodDragRect;
     private bool _hasDrag;
     private Vector3 _offset;
     private float _countTime;
     private float _timeAtClick;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Awake()
     {
-
+        _imgFoodDragRect = _imgFoodDrag.rectTransform;
     }
-
+    
     // Update is called once per frame
     void Update()
     {
@@ -46,9 +46,7 @@ public class DropAndDragFood : MonoBehaviour
                     _imgFoodDrag.gameObject.SetActive(true);
                     _imgFoodDrag.sprite = _currentFood.GetSpriteFood;
 
-                    RectTransform dstRect = _imgFoodDrag.GetComponent<RectTransform>();
-                    dstRect.sizeDelta = _currentFood.GetFoodRect.sizeDelta;
-                    _imgFoodDrag.transform.position = _currentFood.transform.position;
+                    _imgFoodDragRect.sizeDelta = _currentFood.GetFoodRect.sizeDelta;
 
                     _imgFoodDrag.transform.position = _currentFood.transform.position; // gan vi tri               
 

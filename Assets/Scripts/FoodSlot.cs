@@ -5,6 +5,7 @@ using DG.Tweening;
 public class FoodSlot : MonoBehaviour
 {
     private Image _imgFood;
+    private RectTransform _imgFoodRect;
 
     private Color _normalColor = new Color(1f, 1f, 1f, 1f);
     private Color _fadeColor = new Color(1f, 1f, 1f, 0.7f);
@@ -15,6 +16,7 @@ public class FoodSlot : MonoBehaviour
     void Awake()
     {
         _imgFood = this.transform.GetChild(0).GetComponent<Image>();
+        _imgFoodRect = _imgFood.rectTransform;
         _imgFood.gameObject.SetActive(false);
         _grillCtrl = this.transform.parent.parent.GetComponent<GrillStation>();
     }
@@ -87,5 +89,5 @@ public class FoodSlot : MonoBehaviour
     public bool HasFood => _imgFood.gameObject.activeInHierarchy && _imgFood.color == _normalColor;
     public Sprite GetSpriteFood => _imgFood.sprite;
 
-    public RectTransform GetFoodRect => _imgFood.GetComponent<RectTransform>();
+    public RectTransform GetFoodRect => _imgFoodRect;
 }
