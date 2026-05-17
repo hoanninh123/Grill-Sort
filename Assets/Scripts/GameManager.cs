@@ -100,8 +100,7 @@ public class GameManagers : MonoBehaviour
 
         if (_allFood <= 0)
         {
-            Debug.Log("Game Completeeeeee");
-            GameEvents.RaiseGameCompleted();
+            UIManager.Instance.HandleGameCompleted(); 
         }
     }
 
