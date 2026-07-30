@@ -1,20 +1,75 @@
-# Unity generated
-[Ll]ibrary/
-[Tt]emp/
-[Oo]bj/
-[Bb]uild/
-[Bb]uilds/
-[Ll]ogs/
-[Uu]serSettings/
+# ==========================================
+# Unity Auto-Generated Directories
+# ==========================================
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+/[Aa]sset[Oo]ptimizer[Cc]ache/
 
-
-# Visual Studio / Rider
+# ==========================================
+# Visual Studio / VS Code / Rider / IDEs
+# ==========================================
 .vs/
+.vscode/
+.idea/
 *.csproj
+*.unityproj
 *.sln
+*.suo
 *.user
 *.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.VC.opendb
+.vsconfig
 
-# OS
-Thumbs.db
+# ==========================================
+# Unity Crash Reports & Temp Files
+# ==========================================
+sysinfo.txt
+*.pid
+*.pid.meta
+
+# ==========================================
+# Build Artifacts & Exported Packages
+# ==========================================
+*.apk
+*.aab
+*.unitypackage
+*.app
+*.ipa
+
+# ==========================================
+# Node.js / Package Manager Files
+# ==========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.env
+.env*.local
+
+# ==========================================
+# Operating System Files
+# ==========================================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+

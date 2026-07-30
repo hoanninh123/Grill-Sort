@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
     private static UIManager _instance;
     public static UIManager Instance => _instance;
-
+    [Header("Text")]
+    [SerializeField] private TextMeshProUGUI _leverText;
     [Header("UI Panels")]
     [SerializeField] private GameObject _panelGame;
     [SerializeField] private GameObject _panelWin;
@@ -54,11 +56,27 @@ public class UIManager : MonoBehaviour
             }
         }
 
+        // Update initial level text
+        int currentLevel = PlayerPrefs.GetInt("CurrentLevel", 1);
+        UpdateLeverText(currentLevel);
+
         // If reloading via Play Again, bypass the home screen and jump straight to gameplay!
         if (shouldPlayImmediately)
         {
             shouldPlayImmediately = false; // Reset the flag
             OnClickPlayInSameScene();
+        }
+    }
+
+    public void UpdateLeverText(int level)
+    {
+        if (_leverText != null)
+        {
+            _leverText.text = "LEVEL " + level;
+        }
+        else
+        {
+            Debug.LogWarning("UIManager: _leverText is not assigned in the Inspector!");
         }
     }
 

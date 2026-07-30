@@ -27,7 +27,7 @@ public class DropAndDragFood : MonoBehaviour
         if (_countTime >= _timeCheckSuggest)
         {
             _countTime = 0f;
-            GameManagers.Instance?.OnCheckAndShake();
+            GameManager.Instance?.OnCheckAndShake();
         }
 
         if (Input.GetMouseButtonDown(0)) // check khi click chuot

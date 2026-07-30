@@ -1,0 +1,124 @@
+{
+  "levels": [
+    {
+      "levelNumber": 1,
+      "totalFoodTypes": 2,
+      "totalFoodSets": 3,
+      "totalGrills": 3
+    },
+    {
+      "levelNumber": 2,
+      "totalFoodTypes": 3,
+      "totalFoodSets": 4,
+      "totalGrills": 3
+    },
+    {
+      "levelNumber": 3,
+      "totalFoodTypes": 4,
+      "totalFoodSets": 6,
+      "totalGrills": 4
+    },
+    {
+      "levelNumber": 4,
+      "totalFoodTypes": 6,
+      "totalFoodSets": 8,
+      "totalGrills": 4
+    },
+    {
+      "levelNumber": 5,
+      "totalFoodTypes": 8,
+      "totalFoodSets": 10,
+      "totalGrills": 4
+    },
+    {
+      "levelNumber": 6,
+      "totalFoodTypes": 11,
+      "totalFoodSets": 14,
+      "totalGrills": 5
+    },
+    {
+      "levelNumber": 7,
+      "totalFoodTypes": 14,
+      "totalFoodSets": 18,
+      "totalGrills": 5
+    },
+    {
+      "levelNumber": 8,
+      "totalFoodTypes": 18,
+      "totalFoodSets": 22,
+      "totalGrills": 5
+    },
+    {
+      "levelNumber": 9,
+      "totalFoodTypes": 22,
+      "totalFoodSets": 26,
+      "totalGrills": 5
+    },
+    {
+      "levelNumber": 10,
+      "totalFoodTypes": 26,
+      "totalFoodSets": 30,
+      "totalGrills": 5
+    },
+    {
+      "levelNumber": 11,
+      "totalFoodTypes": 30,
+      "totalFoodSets": 35,
+      "totalGrills": 6
+    },
+    {
+      "levelNumber": 12,
+      "totalFoodTypes": 35,
+      "totalFoodSets": 40,
+      "totalGrills": 6
+    },
+    {
+      "levelNumber": 13,
+      "totalFoodTypes": 40,
+      "totalFoodSets": 45,
+      "totalGrills": 6
+    },
+    {
+      "levelNumber": 14,
+      "totalFoodTypes": 45,
+      "totalFoodSets": 50,
+      "totalGrills": 6
+    },
+    {
+      "levelNumber": 15,
+      "totalFoodTypes": 50,
+      "totalFoodSets": 55,
+      "totalGrills": 6
+    },
+    {
+      "levelNumber": 16,
+      "totalFoodTypes": 54,
+      "totalFoodSets": 60,
+      "totalGrills": 6
+    },
+    {
+      "levelNumber": 17,
+      "totalFoodTypes": 58,
+      "totalFoodSets": 65,
+      "totalGrills": 6
+    },
+    {
+      "levelNumber": 18,
+      "totalFoodTypes": 61,
+      "totalFoodSets": 70,
+      "totalGrills": 6
+    },
+    {
+      "levelNumber": 19,
+      "totalFoodTypes": 63,
+      "totalFoodSets": 75,
+      "totalGrills": 6
+    },
+    {
+      "levelNumber": 20,
+      "totalFoodTypes": 65,
+      "totalFoodSets": 80,
+      "totalGrills": 6
+    }
+  ]
+}

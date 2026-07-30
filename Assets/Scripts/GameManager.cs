@@ -2,10 +2,25 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
-public class GameManagers : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
-    private static GameManagers _instance;
-    public static GameManagers Instance => _instance;
+    [System.Serializable]
+    public class LevelData
+    {
+        public int levelNumber;
+        public int totalFoodTypes; // _totalFood
+        public int totalFoodSets;  // _allFood
+        public int totalGrills;    // _totalGrill
+    }
+
+    [System.Serializable]
+    public class LevelDatabase
+    {
+        public List<LevelData> levels;
+    }
+
+    private static GameManager _instance;
+    public static GameManager Instance => _instance;
 
     [SerializeField] private int _allFood;
     [SerializeField] private int _totalFood; // tong so loai thuc an
@@ -15,26 +30,63 @@ public class GameManagers : MonoBehaviour
     private List<GrillStation> _listGrills;
     private float _avgTray; // gia tri trung binh thuc an cho 1 dia
     private List<Sprite> _totalSpriteFood;
+    private LevelDatabase _levelDb;
+    private int _currentLevel = 1;
 
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Awake()
     {
         _listGrills = Utils.GetListInChild<GrillStation>(_gridGrill);
         Sprite[] loadedSprite = Resources.LoadAll<Sprite>("Items");
         _totalSpriteFood = loadedSprite.ToList();
         _instance = this;
+
+        LoadLevelDataFromJSON();
     }
 
     void Start()
     {
+        _currentLevel = PlayerPrefs.GetInt("CurrentLevel", 1);
+
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.UpdateLeverText(_currentLevel);
+        }
+
+        ApplyLevelData(_currentLevel);
         OnInitLevel();
         GameEvents.RaiseFoodCountChanged(_allFood);
     }
 
+    private void LoadLevelDataFromJSON()
+    {
+        TextAsset jsonFile = Resources.Load<TextAsset>("levels");
+        if (jsonFile != null)
+        {
+            _levelDb = JsonUtility.FromJson<LevelDatabase>(jsonFile.text);
+        }
+        else
+        {
+            Debug.LogWarning("File levels.json not found in Resources folder! Falling back to Inspector settings.");
+        }
+    }
+
+    private void ApplyLevelData(int level)
+    {
+        if (_levelDb == null || _levelDb.levels == null || _levelDb.levels.Count == 0) return;
+
+        // Clamp index so if player level exceeds defined levels, use the last level config
+        int levelIndex = Mathf.Clamp(level - 1, 0, _levelDb.levels.Count - 1);
+        LevelData data = _levelDb.levels[levelIndex];
+
+        _totalFood = Mathf.Min(data.totalFoodTypes, _totalSpriteFood.Count);
+        _allFood = data.totalFoodSets;
+        _totalGrill = Mathf.Min(data.totalGrills, _listGrills.Count);
+    }
+
     private void OnInitLevel()
     {
-        List<Sprite> takeFood = _totalSpriteFood.OrderBy(x => Random.value).Take(_totalFood).ToList();//
+        int actualTakeFood = Mathf.Min(_totalFood, _totalSpriteFood.Count);
+        List<Sprite> takeFood = _totalSpriteFood.OrderBy(x => Random.value).Take(actualTakeFood).ToList();
         List<Sprite> useFood = new List<Sprite>();
 
         for (int i = 0; i < _allFood; i++)
@@ -45,36 +97,37 @@ public class GameManagers : MonoBehaviour
         }
 
         _avgTray = Random.Range(1.4f, 2f);
-        int totalTray = Mathf.RoundToInt(useFood.Count / _avgTray);// tinh tong so dia
+        int totalTray = Mathf.RoundToInt(useFood.Count / _avgTray);
 
-        List<int> trayPerGrill = this.DistributeEvelyn(_totalGrill, totalTray);
-        List<int> foodPerGrill = this.DistributeEvelyn(_totalGrill, useFood.Count);
+        int activeGrills = Mathf.Min(_totalGrill, _listGrills.Count);
+        List<int> trayPerGrill = this.DistributeEvelyn(activeGrills, totalTray);
+        List<int> foodPerGrill = this.DistributeEvelyn(activeGrills, useFood.Count);
 
         for (int i = 0; i < _listGrills.Count; i++)
         {
-            bool activeGrill = i < _totalGrill;
+            bool activeGrill = i < activeGrills;
             _listGrills[i].gameObject.SetActive(activeGrill);
 
             if (activeGrill)
             {
                 List<Sprite> lisFood = Utils.TakeAndRemoveRandom<Sprite>(useFood, foodPerGrill[i]);
                 _listGrills[i].OnInitGrill(trayPerGrill[i], lisFood);
-
             }
         }
-
     }
 
     private List<int> DistributeEvelyn(int grillCount, int totalTrays)
     {
         List<int> result = new List<int>();
 
-        // tinh trung binh so luong dia
-        float avg = (float)totalTrays / grillCount; // 3.5
-        int low = Mathf.FloorToInt(avg); // 3
-        int high = Mathf.CeilToInt(avg); // 4
+        if (grillCount <= 0) return result;
 
-        int hightCount = totalTrays - low * grillCount; // tinh so bep nhieu khay hon
+        // tinh trung binh so luong dia
+        float avg = (float)totalTrays / grillCount;
+        int low = Mathf.FloorToInt(avg);
+        int high = Mathf.CeilToInt(avg);
+
+        int hightCount = totalTrays - low * grillCount;
         int lowCount = grillCount - hightCount;
 
         for (int i = 0; i < lowCount; i++)
@@ -100,6 +153,11 @@ public class GameManagers : MonoBehaviour
 
         if (_allFood <= 0)
         {
+            // Tăng level và lưu lại khi hoàn thành màn chơi
+            int nextLevel = _currentLevel + 1;
+            PlayerPrefs.SetInt("CurrentLevel", nextLevel);
+            PlayerPrefs.Save();
+
             UIManager.Instance.HandleGameCompleted(); 
         }
     }
@@ -139,6 +197,5 @@ public class GameManagers : MonoBehaviour
                 return;
             }
         }
-
     }
 }

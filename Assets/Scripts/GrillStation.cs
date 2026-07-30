@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using System.Collections;
+using System.Linq;
 using DG.Tweening;
 
 public class GrillStation : MonoBehaviour
@@ -26,22 +27,28 @@ public class GrillStation : MonoBehaviour
 
     public void OnInitGrill(int totalTray, List<Sprite> listFood)
     {
+        _stackTrays.Clear();
+
         // xu ly set gia tri cho bep truoc
-        int foodCount = Random.Range(1, _totalSlot.Count + 1);
+        int maxSlots = Mathf.Min(_totalSlot.Count, listFood.Count);
+        int foodCount = maxSlots > 0 ? Random.Range(1, maxSlots + 1) : 0;
         List<Sprite> list = listFood;
         List<Sprite> listSlot = Utils.TakeAndRemoveRandom<Sprite>(list, foodCount);
 
         for (int i = 0; i < listSlot.Count; i++)
         {
             FoodSlot slot = this.RandomSlot();
-            slot.OnSetSlot(listSlot[i]);
+            if (slot != null)
+            {
+                slot.OnSetSlot(listSlot[i]);
+            }
         }
-
 
         // xu ly dia
         List<List<Sprite>> remainFood = new List<List<Sprite>>();
 
-        for (int i = 0; i < totalTray - 1; i++)
+        int targetTrayCount = Mathf.Max(1, totalTray - 1);
+        for (int i = 0; i < targetTrayCount; i++)
         {
             if (listFood.Count > 0)
             {
@@ -51,14 +58,35 @@ public class GrillStation : MonoBehaviour
             }
         }
 
+        // dam bao remainFood khong bi rong neu con listFood
+        if (listFood.Count > 0 && remainFood.Count == 0)
+        {
+            remainFood.Add(new List<Sprite>());
+        }
+
         while (listFood.Count > 0)
         {
-            int rans = Random.Range(0, remainFood.Count);
-            if (remainFood[rans].Count < 4)
+            var validTrays = remainFood.Where(t => t.Count < 4).ToList();
+            if (validTrays.Count == 0)
             {
-                remainFood[rans].Add(listFood[0]);
-                listFood.RemoveAt(0);
+                if (remainFood.Count < _totalTrays.Count)
+                {
+                    var newTray = new List<Sprite>();
+                    remainFood.Add(newTray);
+                    validTrays.Add(newTray);
+                }
+                else
+                {
+                    var leastTray = remainFood.OrderBy(t => t.Count).First();
+                    leastTray.Add(listFood[0]);
+                    listFood.RemoveAt(0);
+                    continue;
+                }
             }
+
+            int rans = Random.Range(0, validTrays.Count);
+            validTrays[rans].Add(listFood[0]);
+            listFood.RemoveAt(0);
         }
 
         for (int i = 0; i < _totalTrays.Count; i++)
@@ -73,11 +101,13 @@ public class GrillStation : MonoBehaviour
                 _stackTrays.Push(item);
             }
         }
-
     }
 
     private FoodSlot RandomSlot()
     {
+        if (_totalSlot == null || _totalSlot.Count == 0) return null;
+        if (!_totalSlot.Any(s => !s.HasFood)) return null;
+
     reRand: int n = Random.Range(0, _totalSlot.Count);
         if (_totalSlot[n].HasFood) goto reRand;
 
@@ -133,7 +163,7 @@ public class GrillStation : MonoBehaviour
                 StartCoroutine(IEMerge());
 
                 this.OnPrepareTray(false);
-                GameManagers.Instance?.OnMinusFood();
+                GameManager.Instance?.OnMinusFood();
             }
         }
 
@@ -180,6 +210,11 @@ public class GrillStation : MonoBehaviour
                 }
 
                 CanvasGroup canvas = item.GetComponent<CanvasGroup>();
+                if (canvas == null)
+                {
+                    canvas = item.gameObject.AddComponent<CanvasGroup>();
+                }
+
                 canvas.DOFade(0f, 0.5f).OnComplete(() =>
                 {
                     item.gameObject.SetActive(false);
